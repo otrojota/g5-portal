@@ -1,0 +1,21 @@
+{
+  "name": "g5-portal",
+  "type": "module",
+  "version": "1.0.0",
+  "description": "g5-portal",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "debug": "nodemon -L --inspect=0.0.0.0:9220 --ext js,json,hjson --nolazy ./index.js ",
+    "start": "node index.js"
+  },
+  "author": "Jota",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.19.2",
+    "node-fetch": "^3.3.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.4"
+  }
+}
