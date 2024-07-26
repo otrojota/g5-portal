@@ -77,4 +77,5 @@ class G5RasterVisualizer {
 import("./ColumnsRasterVisualizer.js");
 import("./ScatterPlotRasterVisualizer.js");
 import("./ShaderRasterVisualizer.js");
+import("./ParticlesRasterVisualizer.js");
 export default G5RasterVisualizer;

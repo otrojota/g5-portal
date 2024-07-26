@@ -13,6 +13,7 @@ class G5Tiles extends G5Layer {
     set tileSize(s) {this.config.tileSize = s} 
 
     async initLayer(mapa) {        
+        loaders.registerLoaders(loaders.ImageLoader);
         this.refresh(mapa);
     }
 

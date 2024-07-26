@@ -56,5 +56,6 @@ class G5Layer {
 import("./G5Tiles.js");
 import("./G5Vectorial.js");
 import("./G5Raster.js");
+import("./G5Terrain.js");
 
 export default G5Layer;

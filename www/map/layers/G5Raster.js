@@ -29,7 +29,7 @@ class G5Raster extends G5Layer {
     nextVisualizerId() {return this._nextVisualizerId++}
 
     async loadRasterGrid(mapa) {
-        this.grid = await geoos.getRasterGrid(this.dataSet, this.variable, mapa.bounds, Date.now());
+        this.grid = await geoos.getRasterGrid(this.dataSet, this.variable, mapa.bounds, Date.now(), null, null, 2);
     }
 
     async initLayer(map) {

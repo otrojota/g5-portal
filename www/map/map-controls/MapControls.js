@@ -8,6 +8,9 @@ class MapControls extends ZCustomController {
     async onCmdViewMap_click() {
         await g5.setMapView("map");
     }
+    async onCmdViewGlobe_click() {
+        await g5.setMapView("globe");
+    }
 }
 
 export default MapControls

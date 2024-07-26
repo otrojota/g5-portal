@@ -10,10 +10,13 @@ class Map extends ZCustomController {
     }    
 
     onThis_activated() {
-        this.viewState = {
-            maxPitch: 120,
+        let initialViewState = {
+            maxPitch: 60,
+            //maxPitch: 90,
+            //minPitch: -90,
             longitude: -71.591886,
             latitude: -33.034553,
+            //position: [0, 0, 500],
             zoom: 6,
             pitch: 20,
             bearing: 0,
@@ -22,12 +25,17 @@ class Map extends ZCustomController {
 
         this.deck = new deck.Deck({
             parent: this.view,
-            initialViewState: this.viewState,
+            initialViewState,
             views:[new deck.MapView()],
-            //views: [new deck.FirstPersonView()],
+            //views: [new deck.FirstPersonView({fovy: 50, near: 1, far: 10000})],
             controller: true,
             layers: [],
-            onViewStateChange: (e) => this.onViewStateChange(e)
+            onViewStateChange: (e) => this.onViewStateChange(e),
+            xonLoad: _ => {
+                console.log("deck on load");
+                this.initialized = true;
+                g5.trigger("mapInitialized", this);
+            }
         });  
         g5.on("mapViewChange", this.mapViewChangeListener);
     }
@@ -37,32 +45,40 @@ class Map extends ZCustomController {
     }
 
     onMapViewChanged(v) {
-        console.log("viewChange", v);
         if (v == "map") {
-            this.viewState = {
-                ...this.viewState,
-                transitionDuration: 1000,
-                transitionInterpolator: new deck.LinearInterpolator(['bearing', 'pitch']),
-                pitch: 20,
-                bearing: 0
-            };
+            this.viewState.pitch = 20;
+            this.viewState.zoom = 6;
+            this.viewState.bearing = 0;
+            this.viewState.maxPitch = 60;
+            this.viewState.minPitch = 0;
             this.deck.setProps({
                 views: [new deck.MapView()],
                 viewState: this.viewState,
                 controller: true
             });
         } else if (v == "first-person") {
-            this.viewState = {
-                ...this.viewState,
-                transitionDuration: 1000,
-                transitionInterpolator: new deck.LinearInterpolator(['bearing', 'pitch']),
-                pitch: 60,
-                bearing: 0
-            };
+            this.viewState.position = [0, 0, 500]
+            this.viewState.pitch = 20;
+            this.viewState.bearing = 0;
+            this.viewState.maxPitch = 90;
+            this.viewState.minPitch = -90;
+            this.viewState.zoom = 6;
             this.deck.setProps({
-                views: [new deck.FirstPersonView()],
+                views: new deck.FirstPersonView({fovy: 50, near: 1, far: 100000 }),
                 viewState: this.viewState,
-                controller: true
+                //controller: { type: deck.MapController, scrollZoom: true, dragPan: true, dragRotate: true, doubleClickZoom: true, keyboard: true, touchZoom: true, touchRotate: true },
+            });
+        } else if (v == "globe") {
+            this.viewState.position = [0, 0, 500]
+            this.viewState.pitch = 45;
+            this.viewState.bearing = 0;
+            this.viewState.maxPitch = 90;
+            this.viewState.minPitch = -90;
+            this.viewState.zoom = 6;
+            this.deck.setProps({
+                views: new deck._GlobeView(),
+                viewState: this.viewState,
+                //controller: { type: deck.MapController, scrollZoom: true, dragPan: true, dragRotate: true, doubleClickZoom: true, keyboard: true, touchZoom: true, touchRotate: true },
             });
         } else {
             throw "Vista " + v + " no implementada";
@@ -70,7 +86,6 @@ class Map extends ZCustomController {
     }
     
     recalcBounds(viewState) {
-        this.viewState = viewState;
         const vp =  new deck.WebMercatorViewport(viewState);
         let n = 90, w = -180, s = -90, e = 180;
         if (vp.pitch < 65) {
@@ -92,12 +107,13 @@ class Map extends ZCustomController {
         }
 
         this._bounds = {n,w,s,e}
-        console.log("bounds", this._bounds, vp.pitch);
+        //console.log("bounds", this._bounds, vp.pitch);
         return this._bounds;
     }
     get bounds() {return this._bounds}
 
     onViewStateChange({viewState}) {
+        this.viewState = viewState;
         const oldB = this.bounds;
         const b = this.recalcBounds(viewState);
         if (!oldB || oldB.n != b.n || oldB.w != b.w || oldB.s != b.s || oldB.e != b.e) {
@@ -111,10 +127,11 @@ class Map extends ZCustomController {
                     await g5.trigger("mapMoved", this.bounds);
                 } else {
                     this.initialized = true;
-                    await g5.trigger("mapInitialized", this);
+                    g5.trigger("mapInitialized", this);
                 }
             }, 300); 
         }        
+        this.deck.setProps({viewState: this.viewState})
     }
     
     async addLayer(g5Layer) {

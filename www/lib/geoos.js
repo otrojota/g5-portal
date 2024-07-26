@@ -34,11 +34,12 @@ class GEOOS {
         let url = `${dataSet}/${variable}/${query}`;
         return await this.zClient.get(url, params);
     }
-    async getRasterGrid(dataSet, variable, bounds, time, dLat, dLng) {
+    async getRasterGrid(dataSet, variable, bounds, time, dLat, dLng, margin) {
         let params = {n: bounds.n, w: bounds.w, s: bounds.s, e: bounds.e}
         if (time) params.time = time;
         if (dLat) params.dLat = dLat;
         if (dLng) params.dLng = dLng;
+        if (margin) params.margin = margin;
         return await this.rasterQuery(dataSet, variable, "grid", params)
     }
 }
